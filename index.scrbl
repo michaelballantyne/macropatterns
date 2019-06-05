@@ -6,9 +6,43 @@
 
 @section{Patterns}
 
-@subsection[#:tag "extensible-embedded-compiler"]{Extensible embedded compiler}
+@subsection[#:tag "top" #:tag-prefix "extensible-embedded-compiler"]{Extensible embedded compiler}
 
-@subsection{Persistent symbol table}
+@subsubsection{Intent}
+
+Implement full-featured domain-specific languages that:
+
+@itemlist[
+  @item{can employ multiple passes of analysis and compilation in their implementation.}
+  @item{integrate fluidly with Racket and other DSLs while protecting DSL abstractions.}
+  @item{are macro-extensible.}
+]
+
+@subsubsection{Motivation}
+
+While one use of macros is to implement new language forms that extend the base Racket language, another is to implement conceptually distinct domain-specific langauges (DSLs).
+
+A DSL has its own grammar, static semantics, and evaluation model. Implementing these features may require the flexibility of a traditional multi-pass compiler. At the same time, we often want DSLs to integrate fluidly with Racket and other DSLs. And just as programers can create abstractions atop Racket using macros, they should be able to create abstractions atop DSLs as well.
+
+The extensible embedded compiler pattern is a way of structuring a DSL implementation to support all of these properties. It replicates the structure of the implementation of Racket, using a macro expander tailored to the DSL as front-end and a traditional multi-pass compiler as back-end. The DSL's macro expander shares the Racket expander's hygiene mechanism and expander environment in order to integrate the DSL syntax with Racket.
+
+@subsubsection{Applicability}
+
+Use an extensible embedded compiler when:
+
+@itemlist[
+  @item{the implementation of the DSL requires non-local analysis or transformation passes on the DSL syntax such as typechecking, flow analysis, or optimizing compilation.}
+  @item{and either:
+    @itemlist[
+      @item{the DSL should integrate with Racket or other DSLs via shared variable bindings.}
+      @item{DSL definitions should be managed by Racket modules.}
+      @item{users of the DSL should be able to abstract over DSL syntax using macros.}
+    ]
+  }
+]
+
+
+@subsection[#:tag "top" #:tag-prefix "persistent-symbol-table"]{Persistent symbol table}
 
 @subsubsection{Intent}
 
@@ -16,7 +50,7 @@ A persistent symbol table stores mappings from source name bindings to informati
 
 @subsubsection{Motivation}
 
-Languages in Racket can be implemented as embedded multi-pass compilers with a macro expansion pass followed by traditional typechecking, optimization and compilation passes (see the @secref["extensible-embedded-compiler"] pattern). Compilers often need to keep track of information associated with names. Information known during the expansion pass can be naturally associated with the name's binding in the @seclink["expander-environment"]{expander environment}. However, information computed in later compiler passes must be stored elsewhere.
+Languages in Racket can be implemented as embedded multi-pass compilers with a macro expansion pass followed by traditional typechecking, optimization and compilation passes (see the @secref["top" #:tag-prefixes '("extensible-embedded-compiler")] pattern). Compilers often need to keep track of information associated with names. Information known during the expansion pass can be naturally associated with the name's binding in the @seclink["expander-environment"]{expander environment}. However, information computed in later compiler passes must be stored elsewhere.
 
 For example, consider a parser generator that compiles each grammar non-terminal to a Racket function that matches it. The compiler needs a symbol table mapping non-terminal names to Racket function names. Because the name of the Racket function is generated during compilation, not grammar expansion, it cannot be stored in the expander environment binding for the non-terminal name.
 
@@ -62,7 +96,8 @@ Compilation of a module-level form that needs a symbol table entry should insert
      (define data _) (code:comment "compute information to store in symbol table")
      #`(begin
          (define tmp rhs)
-         (free-id-table-set! table #'name #,data))]))
+         (begin-for-syntax
+           (free-id-table-set! table #'name #'#,data)))]))
 ]
 
 Depending on the structure of the compilation pass, the @racket[begin-for-syntax] block may be inserted differently. A @racket[#%module-begin] macro processing a whole module body may collect a set of such blocks and emit them as part of its final expansion.
