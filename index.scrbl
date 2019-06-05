@@ -41,6 +41,25 @@ Use an extensible embedded compiler when:
   }
 ]
 
+@subsubsection{Solution}
+
+The implementation of an extensible embedded compiler consists of the following high-level components:
+
+@itemlist[
+  @item{a set of @seclink["top" #:tag-prefixes '("literal")]{literals} for the core forms of the language}
+  @item{@seclink["top" #:tag-prefixes '("syntax-interface")]{syntax interfaces} for DSL macros}
+  @item{@seclink["top" #:tag-prefixes '("syntax-interface")]{syntax interfaces} for access to static information associated with DSL variable bindings}
+  @item{phase 1 functions implementing the expand loops for each non-terminal of the DSL grammar and expansion rules for each core syntactic form}
+  @item{phase 1 functions implementing the back-end compiler passes, and any needed @seclink["top" #:tag-prefixes '("persistent-symbol-table")]{persistent symbol tables}}
+  @item{boundary macros that connect the DSL to Racket or other DSLs}
+]
+
+
+@subsection[#:tag "top" #:tag-prefix "literal"]{Literal}
+
+@subsection[#:tag "top" #:tag-prefix "syntax-interface"]{Syntax interface}
+
+
 
 @subsection[#:tag "top" #:tag-prefix "persistent-symbol-table"]{Persistent symbol table}
 
