@@ -9,7 +9,7 @@
 
 @section[#:tag "top" #:tag-prefix "literal"]{Literal}
 
-@section[#:tag "top" #:tag-prefix "syntax-interface"]{Syntax interface}
+@section[#:tag "top" #:tag-prefix "binding-interface"]{Binding interface}
 
 @include-section["persistent-symbol-table.scrbl"]
 

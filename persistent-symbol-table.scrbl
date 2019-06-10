@@ -151,7 +151,7 @@ This pattern involves communicating data between macro invocations. If that data
 @section{Known uses}
 
 @itemlist[
-  @item{The Typed Racket global type environment. See @hyperlink["https://github.com/racket/typed-racket/blob/master/typed-racket-lib/typed-racket/env/global-env.rkt"]{typed-racket/env/global-env}, as well as the @seclink["references"]{references} below.}
+  @item{The Typed Racket global type environment. See @hyperlink["https://github.com/racket/typed-racket/blob/master/typed-racket-lib/typed-racket/env/global-env.rkt"]{typed-racket/env/global-env}, @cite["libs"] and @cite["types"].}
   @item{My embedded compilers for PEGs and miniKanren. TODO: link}
 ]
 
@@ -162,12 +162,14 @@ This pattern involves communicating data between macro invocations. If that data
   @item{Separately-compiled DSL definition form. TODO}
 ]
 
-@section[#:tag "references"]{References}
-
-@itemlist[
-  @item{@hyperlink["https://www.cs.utah.edu/plt/publications/macromod.pdf"]{Composable and Compilable Macros}}
-  @item{@hyperlink["https://www.cs.utah.edu/plt/publications/pldi11-tscff.pdf"]{Languages as Libraries}}
-  @item{@hyperlink["https://www2.ccs.neu.edu/racket/pubs/scheme2007-ctf.pdf"]{Advanced Macrology and the Implementation of Typed Scheme}}
+@bibliography[
+  @bib-entry[#:key "composable"
+             #:title "Composable and Compilable Macros"
+             #:url "https://www.cs.utah.edu/plt/publications/macromod.pdf"]
+  @bib-entry[#:key "libs"
+             #:title "Languages as Libraries"
+             #:url "https://www.cs.utah.edu/plt/publications/pldi11-tscff.pdf"]
+  @bib-entry[#:key "types"
+             #:title "Advanced Macrology and the Implementation of Typed Scheme"
+             #:url "https://www2.ccs.neu.edu/racket/pubs/scheme2007-ctf.pdf"]
 ]
-
-
