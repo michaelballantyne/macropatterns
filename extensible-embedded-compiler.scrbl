@@ -37,19 +37,42 @@ Use an extensible embedded compiler when:
 
 @section{Solution}
 
-The high level components of an extensible embedded compiler include the vocabulary of core syntactic forms, interfaces describing the information associated with DSL variables and macros in the expander environment, the DSL's macro expander, the back-end compiler passes, and macros that embed the DSL within other languages and drive DSL compilation. The following sections address each component in turn.
+The high level components of an extensible embedded compiler are a vocabulary of core syntactic forms, a macro expander, a back-end compiler, and macros to embed the DSL in Racket. The following sections address each component in turn.
+
+In order to illustrate the pattern, we use as an example the DSL of parsing expression grammars (PEGs). Basic parsing expressions match empty input, characters, sequences, and alternatives. A local binding form enables named recursive grammars.
+
+@verbatim|{
+peg := (~eps)
+     | (~char <character>)
+     | (~seq <peg> <peg>)
+     | (~or <peg> <peg>)
+     | (~local ([<identifier> <peg>]) <peg>)
+}|
+
+A Racket macro defines the syntax @racket[parse] which accepts a PEG expression and a string to match and returns a number indicating how many characters were consumed by the match.
 
 @subsection{The vocabulary of syntactic forms}
 
-Create the binding identities. Doesn't define the syntax of each form; just its identity which is needed to recognize it. Just like a Racket variable binding, these bindings can be renamed, hidden, etc on export and import.
+Syntactic forms in Racket are associated with an identifier binding in a module or local scope, just like runtime bindings. This allows the visibility and name of syntactic forms to be controlled by modules and lexical scope, and is essential to Racket's conception of "languages as libraries". Consequently, the first task in defining a DSL is to create bindings for the core syntactic forms of the DSL.
 
-Defines a literal set for use with syntax parse in the expander and compiler in order to recognize the forms.
+When we create identifier bindings, we also have to define their meaning if they appear as a normal Racket expression. DSL forms should appear in the context of the DSL, not in Racket, so we define their meaning as normal Racket expressions as an error.
 
-@subsection{Interfaces for expander environment bindings}
+The @seclink["top" #:tag-prefixes '("literal")] pattern describes how to establish the bindings. Using @racket[define-literals] from syntax-generic2 to abstract over that pattern, the literal definitions for the PEG language may be written as follows:
+
+@racketblock[
+(define-literal-forms
+  peg-literals
+  "peg forms cannot be used as racket expressions"
+  (-eps
+   -char
+   -seq
+   -or
+   -local))
+]
 
 @subsection{The expander}
 
-The expander has three jobs: parsing the syntax of the DSL's core syntactic forms, implementing scope and binding structure, and expanding macros.
+The expander has three jobs: parsing the syntax of the DSL's core syntactic forms, implementing scope and binding structure, and expanding macros. The work of each of these three tasks must be interleaved. Furthermore, the expander is responsible for defining interfaces...
 
 @subsection{The compiler}
 
