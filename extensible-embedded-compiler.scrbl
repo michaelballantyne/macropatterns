@@ -38,7 +38,7 @@ Use an extensible embedded compiler when:
   }
 ]
 
-@section{Solution}
+@section{Solution and example}
 
 The high level components of an extensible embedded compiler are a vocabulary of core syntactic forms, a macro expander, a back-end compiler, and macros to embed the DSL in Racket. The following sections address each component in turn.
 
@@ -95,14 +95,13 @@ As a first step we need to define data structures for the representations of DSL
 
 In DSLs with richer static semantics additional information such as types would be associated with variables. More sophisticated extensible embedded compilers usually employ the @secref["top" #:tag-prefixes '("binding-interface")] pattern in their expander environment representations to allow other languages to create variable bindings that interoperate with the DSL.
 
-Given the expander environment representations, we can begin to define the expander itself as a phase 1 function that accepts and returns syntax:
+The main part of the expander for PEGs is defined in @figure-ref["peg-expander"].
 
 @(require scribble/html-properties scribble/core)
 @(define figure-fix
    (css-addition
      (string->bytes/utf-8
        ".Figure { border: 1px solid #929292 }")))
-
 @figure["peg-expander" "PEG DSL Expander" #:style (style "foo" (list figure-fix))]{
 @codeblock0[#:keep-lang-line? #f #:line-numbers 1]|{
 #lang racket
@@ -132,16 +131,18 @@ Given the expander environment representations, we can begin to define the expan
         (-local [g^ e^]
                 b^))]
       [name:id
-       (when (not (peg-variable? #'name))
+       (when (not (peg-variable? (lookup #'name)))
          (raise-syntax-error #f "not bound as a peg" #'name))
        this-syntax]
 
       ; Macros
       [(head . rest)
-       #:when (peg-macro? stx)
+       #:when (peg-macro? (lookup #'head))
        (expand-peg
-        (peg-macro stx))])))
+        ((peg-macro-transformer (lookup #'head)) stx))])))
 }|}
+
+
 
 @subsection{The compiler}
 
@@ -158,6 +159,14 @@ Macro in the language that the DSL is to be embedded in; usually Racket.
 Invoke the expander and the compiler.
 
 Perform and wrapping or conversion of values between the internal representation of the DSL and the external rep shared with Racket.
+
+@section{Consequences}
+
+@section{Implementation details}
+
+@section{Known uses}
+
+@section{Related patterns}
 
 @bibliography[
   @bib-entry[#:key "peg" #:title "Parsing expression grammars: a recognition-based syntactic foundation"
